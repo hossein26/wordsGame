@@ -5,7 +5,7 @@
     android:background="@drawable/background_main">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rc_game_words"
+        android:id="@+id/rv_game_words"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"/>
@@ -29,14 +29,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/background_rv_item"
-                android:text="انصراف"/>
+                android:text="@string/cancel"/>
             <Button
                 android:id="@+id/btn_game_acceptAction"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="8dp"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/background_primary_button"
-                android:text="تایید"/>
+                android:text="@string/accept"/>
         </LinearLayout>
     </FrameLayout>
 

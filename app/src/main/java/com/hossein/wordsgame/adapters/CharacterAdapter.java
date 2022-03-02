@@ -1,5 +1,6 @@
 package com.hossein.wordsgame.adapters;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +37,29 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.Char
         notifyItemInserted(characterPlaceHolders.size()-1);
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    public void clear(){
+        this.characterPlaceHolders.clear();
+        notifyDataSetChanged();
+    }
+
+    public String getWord(){
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < characterPlaceHolders.size(); i++) {
+            stringBuilder.append(characterPlaceHolders.get(i).getCharacter());
+        }
+        return stringBuilder.toString();
+    }
+
+    public void makeWordVisible(String word){
+        for (int i = 0; i < characterPlaceHolders.size(); i++) {
+            if (characterPlaceHolders.get(i).getTag() != null && characterPlaceHolders.get(i).getTag().equalsIgnoreCase(word)){
+                characterPlaceHolders.get(i).setVisible(true);
+                notifyItemChanged(i);
+            }
+        }
+    }
+
     @NonNull
     @Override
     public CharacterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -63,7 +87,19 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.Char
         }
 
         public void bind(CharacterPlaceHolder characterPlaceHolder) {
-            charTv.setText(characterPlaceHolder.getCharacter().toString());
+            if (characterPlaceHolder.isVisible()){
+                charTv.setText(characterPlaceHolder.getCharacter().toString());
+                charTv.setVisibility(View.VISIBLE);
+            }else {
+                charTv.setVisibility(View.INVISIBLE);
+            }
+
+            if (characterPlaceHolder.isNull()){
+                itemView.setBackground(null);
+            }else {
+                itemView.setBackgroundResource(R.drawable.background_rv_item);
+            }
+
             itemView.setOnClickListener(view ->
                     onRecyclerViewItemClickListener.onItemClick(characterPlaceHolder, getAdapterPosition())
             );

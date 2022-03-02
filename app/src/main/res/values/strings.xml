@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">بازی کلمات</string>
+    <string name="accept">تایید</string>
+    <string name="cancel">انصراف</string>
 </resources>

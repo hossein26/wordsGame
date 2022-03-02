@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,7 +14,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.hossein.wordsgame.OnRecyclerViewItemClickListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.hossein.wordsgame.R;
 import com.hossein.wordsgame.adapters.CharacterAdapter;
 import com.hossein.wordsgame.data.CharacterPlaceHolder;
@@ -28,6 +29,16 @@ public class GameFragment extends Fragment {
     private Level level;
     private CharacterAdapter guessCharacterAdapter;
     private View guessActionContainer;
+    private Button btnAccept;
+    private Button btnCancel;
+    private CharacterAdapter wordsAdapter;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        level = getArguments() != null ? getArguments().getParcelable("level") : null;
+        Log.d(TAG, "onCreate: ");
+    }
 
     @Nullable
     @Override
@@ -38,8 +49,9 @@ public class GameFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        level = getArguments() != null ? getArguments().getParcelable("level") : null;
         guessActionContainer = view.findViewById(R.id.frame_game_guessActionContainer);
+        btnAccept = view.findViewById(R.id.btn_game_acceptAction);
+        btnCancel = view.findViewById(R.id.btn_game_cancel);
 
         //rv of game char
         RecyclerView rvGameCharacter = view.findViewById(R.id.rv_game_character);
@@ -48,6 +60,7 @@ public class GameFragment extends Fragment {
         List<CharacterPlaceHolder> characterPlaceHolders = new ArrayList<>();
         for (int i = 0; i < uniqueCharacters.size(); i++) {
             CharacterPlaceHolder characterPlaceHolder = new CharacterPlaceHolder();
+            characterPlaceHolder.setVisible(true);
             characterPlaceHolder.setCharacter(uniqueCharacters.get(i));
             characterPlaceHolders.add(characterPlaceHolder);
         }
@@ -63,5 +76,49 @@ public class GameFragment extends Fragment {
         rvGuessCharacters.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false));
         guessCharacterAdapter = new CharacterAdapter();
         rvGuessCharacters.setAdapter(guessCharacterAdapter);
+        btnAccept.setOnClickListener(v ->{
+            String word = guessCharacterAdapter.getWord();
+            for (int i = 0; i < level.getWords().size(); i++) {
+                if (word.equalsIgnoreCase(level.getWords().get(i))){
+                    btnCancel.performClick();
+                    wordsAdapter.makeWordVisible(word);
+                    Log.d(TAG, "onViewCreated: " + word);
+                    return;
+                }
+            }
+            btnCancel.performClick();
+            Snackbar.make(requireContext(), v,"صحیح نیست!", Snackbar.LENGTH_SHORT).show();
+        });
+        btnCancel.setOnClickListener(v ->{
+            guessActionContainer.setVisibility(View.GONE);
+            guessCharacterAdapter.clear();
+        });
+
+        //rv of game words
+        RecyclerView rvGameWords = view.findViewById(R.id.rv_game_words);
+        int maxLength = 0;
+        for (int i = 0; i < level.getWords().size(); i++) {
+            if (level.getWords().get(i).length() > maxLength){
+                maxLength = level.getWords().get(i).length();
+            }
+        }
+        rvGameWords.setLayoutManager(new GridLayoutManager(getContext(), maxLength, RecyclerView.VERTICAL, false));
+        List<CharacterPlaceHolder> wordsCharacterPlaceHolder = new ArrayList<>();
+        for (int i = 0; i < level.getWords().size(); i++) {
+            for (int j = 0; j < maxLength; j++) {
+                CharacterPlaceHolder characterPlaceHolder = new CharacterPlaceHolder();
+                if (j < level.getWords().get(i).length()){
+                    characterPlaceHolder.setCharacter(level.getWords().get(i).charAt(j));
+                    characterPlaceHolder.setNull(false);
+                    characterPlaceHolder.setVisible(false);
+                    characterPlaceHolder.setTag(level.getWords().get(i));
+                }else {
+                    characterPlaceHolder.setNull(true);
+                }
+                wordsCharacterPlaceHolder.add(characterPlaceHolder);
+            }
+        }
+        wordsAdapter = new CharacterAdapter(wordsCharacterPlaceHolder);
+        rvGameWords.setAdapter(wordsAdapter);
     }
 }
