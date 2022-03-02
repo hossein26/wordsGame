@@ -8,6 +8,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.hossein.wordsgame.OnRecyclerViewItemClickListener;
 import com.hossein.wordsgame.R;
 import com.hossein.wordsgame.data.CharacterPlaceHolder;
 
@@ -16,9 +17,23 @@ import java.util.List;
 
 public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.CharacterViewHolder> {
     private List<CharacterPlaceHolder> characterPlaceHolders = new ArrayList<>();
+    private OnRecyclerViewItemClickListener<CharacterPlaceHolder> onRecyclerViewItemClickListener;
+
+    public CharacterAdapter(){
+
+    }
 
     public CharacterAdapter(List<CharacterPlaceHolder> characterPlaceHolders) {
         this.characterPlaceHolders = characterPlaceHolders;
+    }
+
+    public void setOnRecyclerViewItemClickListener(OnRecyclerViewItemClickListener<CharacterPlaceHolder> onRecyclerViewItemClickListener){
+        this.onRecyclerViewItemClickListener = onRecyclerViewItemClickListener;
+    }
+
+    public void add(CharacterPlaceHolder characterPlaceHolder){
+        this.characterPlaceHolders.add(characterPlaceHolder);
+        notifyItemInserted(characterPlaceHolders.size()-1);
     }
 
     @NonNull
@@ -39,7 +54,7 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.Char
         return characterPlaceHolders.size();
     }
 
-    public class CharacterViewHolder extends RecyclerView.ViewHolder{
+    public class CharacterViewHolder extends RecyclerView.ViewHolder {
         private TextView charTv;
 
         public CharacterViewHolder(@NonNull View itemView) {
@@ -47,8 +62,11 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.Char
             charTv = itemView.findViewById(R.id.tv_char);
         }
 
-        public void bind(CharacterPlaceHolder characterPlaceHolder){
+        public void bind(CharacterPlaceHolder characterPlaceHolder) {
             charTv.setText(characterPlaceHolder.getCharacter().toString());
+            itemView.setOnClickListener(view ->
+                    onRecyclerViewItemClickListener.onItemClick(characterPlaceHolder, getAdapterPosition())
+            );
         }
     }
 }

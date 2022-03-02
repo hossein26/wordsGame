@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.hossein.wordsgame.OnRecyclerViewItemClickListener;
 import com.hossein.wordsgame.R;
 import com.hossein.wordsgame.adapters.CharacterAdapter;
 import com.hossein.wordsgame.data.CharacterPlaceHolder;
@@ -25,6 +26,8 @@ import java.util.List;
 public class GameFragment extends Fragment {
     private static final String TAG = "GameFragment";
     private Level level;
+    private CharacterAdapter guessCharacterAdapter;
+    private View guessActionContainer;
 
     @Nullable
     @Override
@@ -35,8 +38,10 @@ public class GameFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        level = getArguments().getParcelable("level");
+        level = getArguments() != null ? getArguments().getParcelable("level") : null;
+        guessActionContainer = view.findViewById(R.id.frame_game_guessActionContainer);
 
+        //rv of game char
         RecyclerView rvGameCharacter = view.findViewById(R.id.rv_game_character);
         rvGameCharacter.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false));
         List<Character> uniqueCharacters = GamePlayUtil.extractUniqueCharacter(level.getWords());
@@ -48,6 +53,15 @@ public class GameFragment extends Fragment {
         }
         CharacterAdapter characterAdapter = new CharacterAdapter(characterPlaceHolders);
         rvGameCharacter.setAdapter(characterAdapter);
+        characterAdapter.setOnRecyclerViewItemClickListener((item, position) -> {
+            guessActionContainer.setVisibility(View.VISIBLE);
+            guessCharacterAdapter.add(item);
+        });
 
+        //rv of guess char
+        RecyclerView rvGuessCharacters = view.findViewById(R.id.rv_game_guess);
+        rvGuessCharacters.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false));
+        guessCharacterAdapter = new CharacterAdapter();
+        rvGuessCharacters.setAdapter(guessCharacterAdapter);
     }
 }
